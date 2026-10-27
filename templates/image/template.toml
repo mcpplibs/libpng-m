@@ -1,0 +1,4 @@
+[template]
+description  = "PNG with import mcpplibs.mwrap.libpng: an image written and read back with the simplified API, any PNG described with the low-level reader"
+default      = true
+post_message = "Run `mcpp run` (writes and checks gradient.png), or `mcpp run -- <file.png>` to describe a PNG."

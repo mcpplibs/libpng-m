@@ -1,0 +1,115 @@
+// {{project.name}} — PNG through import mcpplibs.mwrap.libpng: an RGBA
+// gradient written with libpng's simplified API and read back pixel for
+// pixel, and any PNG described by the low-level reader, whose errors arrive
+// by longjmp at the setjmp on png_jmpbuf.
+#include <csetjmp>  // setjmp: the C library's macro, for png_jmpbuf
+
+import std;
+import mcpplibs.mwrap.libpng;
+
+using namespace mcpplibs::mwrap::libpng::macros;  // PNG_FORMAT_RGBA, PNG_IMAGE_SIZE, png_jmpbuf …
+
+namespace {
+
+constexpr png_uint_32 width = 256, height = 64;
+
+std::vector<png_byte> gradient() {
+    std::vector<png_byte> rgba(width * height * 4);
+    for (png_uint_32 y = 0; y < height; ++y)
+        for (png_uint_32 x = 0; x < width; ++x) {
+            png_byte* p = rgba.data() + (y * width + x) * 4;
+            p[0] = static_cast<png_byte>(x);
+            p[1] = static_cast<png_byte>(y * 4);
+            p[2] = static_cast<png_byte>(255 - x);
+            p[3] = 255;
+        }
+    return rgba;
+}
+
+// Write, then read back, with the simplified API (errors in image.message).
+bool round_trip(const char* path) {
+    const std::vector<png_byte> pixels = gradient();
+    png_image image{};
+    image.version = PNG_IMAGE_VERSION;
+    image.width = width;
+    image.height = height;
+    image.format = PNG_FORMAT_RGBA;
+    if (!png_image_write_to_file(&image, path, 0, pixels.data(), 0, nullptr)) {
+        std::println(std::cerr, "write {}: {}", path, image.message);
+        return false;
+    }
+    png_image read{};
+    read.version = PNG_IMAGE_VERSION;
+    if (!png_image_begin_read_from_file(&read, path)) {
+        std::println(std::cerr, "read {}: {}", path, read.message);
+        return false;
+    }
+    read.format = PNG_FORMAT_RGBA;
+    std::vector<png_byte> back(PNG_IMAGE_SIZE(read));
+    if (!png_image_finish_read(&read, nullptr, back.data(), 0, nullptr)) {
+        std::println(std::cerr, "read {}: {}", path, read.message);
+        return false;
+    }
+    std::println("{}: {}x{} RGBA written and read back, {}", path, read.width, read.height,
+                 back == pixels ? "identical" : "DIFFERENT");
+    return back == pixels;
+}
+
+const char* colour_type(int type) {
+    switch (type) {
+        case PNG_COLOR_TYPE_GRAY: return "grey";
+        case PNG_COLOR_TYPE_GRAY_ALPHA: return "grey + alpha";
+        case PNG_COLOR_TYPE_PALETTE: return "palette";
+        case PNG_COLOR_TYPE_RGB: return "RGB";
+        case PNG_COLOR_TYPE_RGB_ALPHA: return "RGBA";
+        default: return "?";
+    }
+}
+
+char error_text[256];
+void on_error(png_structp png, png_const_charp message) {
+    std::snprintf(error_text, sizeof error_text, "%s", message);
+    png_longjmp(png, 1);
+}
+
+// The low-level reader. Nothing with a destructor lives in this frame: the
+// error handler longjmps back to the setjmp.
+bool describe(const char* path) {
+    std::FILE* file = std::fopen(path, "rb");
+    if (!file) {
+        std::println(std::cerr, "cannot open {}", path);
+        return false;
+    }
+    png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, on_error, nullptr);
+    png_infop info = png_create_info_struct(png);
+    if (setjmp(png_jmpbuf(png))) {
+        std::println(std::cerr, "{}: not a readable PNG ({})", path, error_text);
+        png_destroy_read_struct(&png, &info, nullptr);
+        std::fclose(file);
+        return false;
+    }
+    png_init_io(png, file);
+    png_read_info(png, info);
+    std::println("{}: {}x{}, {}-bit {}{}", path, png_get_image_width(png, info), png_get_image_height(png, info),
+                 png_get_bit_depth(png, info), colour_type(png_get_color_type(png, info)),
+                 png_get_interlace_type(png, info) == PNG_INTERLACE_ADAM7 ? ", Adam7-interlaced" : "");
+    double gamma = 0;
+    if (png_get_gAMA(png, info, &gamma)) std::println("  gamma {:.5f}", gamma);
+    int intent = 0;
+    if (png_get_sRGB(png, info, &intent)) std::println("  sRGB, rendering intent {}", intent);
+    png_textp text = nullptr;
+    int count = 0;
+    png_get_text(png, info, &text, &count);
+    for (int i = 0; i < count; ++i) std::println("  {}: {}", text[i].key, text[i].text);
+    png_destroy_read_struct(&png, &info, nullptr);
+    std::fclose(file);
+    return true;
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+    std::println("libpng {} (header {})", png_get_libpng_ver(nullptr), PNG_LIBPNG_VER_STRING);
+    if (argc > 1) return describe(argv[1]) ? 0 : 1;
+    return round_trip("gradient.png") && describe("gradient.png") ? 0 : 1;
+}
