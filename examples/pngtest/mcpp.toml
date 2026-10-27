@@ -1,0 +1,15 @@
+[package]
+name        = "pngtest"
+version     = "0.1.0"
+description = "libpng's pngtest (1.6.43), ported to C++23 against import mcpplibs.mwrap.libpng; the host upstream's own test images run on"
+license     = "libpng-2.0"
+
+[targets.pngtest]
+kind = "bin"
+main = "src/main.cpp"
+
+[dependencies]
+"mcpplibs.mwrap.libpng" = { path = "../.." }
+# zlib.h, for ZLIB_VERSION and Z_FILTERED as pngtest.c uses them: the zlib
+# compat.libpng is built over.
+compat.zlib = "1.3.2"
