@@ -74,7 +74,8 @@ def build(project: Path, name: str, mcpp: str, toolchain: str | None) -> Path:
 
 def run(exe: Path, args: list[str], cwd: Path) -> tuple[int, str]:
     out = subprocess.run([str(exe), *args], cwd=cwd, capture_output=True, timeout=600)
-    return out.returncode, (out.stdout + out.stderr).decode('latin-1')
+    # Windows' text-mode stdout writes CRLF: compare and match lines, not line ends.
+    return out.returncode, (out.stdout + out.stderr).decode('latin-1').replace('\r\n', '\n')
 
 
 def main():
