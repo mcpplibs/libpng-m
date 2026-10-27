@@ -1,0 +1,19 @@
+libpng-m: C++ module wrapper
+Copyright (c) 2026 mcpp-community contributors
+
+The wrapper contributions are licensed under the Apache License, Version 2.0.
+Upstream code, copied interfaces and dependencies retain their original
+licenses and copyright notices. libpng is distributed under the PNG Reference
+Library License version 2 (libpng-2.0):
+
+  Copyright (c) 1995-2024 The PNG Reference Library Authors.
+  Copyright (c) 2018-2024 Cosmin Truta.
+  Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
+  Copyright (c) 1996-1997 Andreas Dilger.
+  Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
+
+Its original README and license are retained in upstream/libpng/. The
+library itself is built by compat.libpng from the same release, over
+compat.zlib. examples/pngtest/src/main.cpp is a C++ port of the release's
+pngtest.c and keeps that file's copyright and license notice. Provenance and
+checksums are recorded in upstream/documents.json.

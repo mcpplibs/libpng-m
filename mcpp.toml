@@ -1,0 +1,43 @@
+# Module wrapper; upstream API preserved. Policy: mcpp-index/docs/mwrap.md.
+[package]
+namespace   = "mcpplibs.mwrap"
+name        = "libpng"
+version     = "1.6.43"
+description = "libpng 1.6.43 C++ modules for mcpp (import mcpplibs.mwrap.libpng;): the API of png.h over compat.libpng, its macros as constants and constexpr functions, its build options as constexpr bool"
+license     = "Apache-2.0"
+authors     = ["mcpp-community"]
+repo        = "https://github.com/mcpplibs/libpng-m"
+platforms   = ["linux", "macos", "windows"]
+
+[targets.libpng]
+kind = "lib"
+
+[build]
+sources      = ["src/*.cppm"]
+# <mwrap/libpng/macros.hpp>: png.h's macros as macros, for #if and setjmp code.
+include_dirs = ["include"]
+
+[dependencies]
+compat.libpng = "1.6.43"
+
+[dev-dependencies]
+compat.gtest = "1.15.2"
+
+[package.metadata.mwrap]
+upstream-version = "1.6.43"
+
+[[runtime.deploy]]
+from = "LICENSE"
+to   = "licenses/libpng"
+
+[[runtime.deploy]]
+from = "NOTICE"
+to   = "licenses/libpng"
+
+[[runtime.deploy]]
+from = "upstream/libpng/README"
+to   = "licenses/libpng/upstream/libpng"
+
+[[runtime.deploy]]
+from = "upstream/libpng/LICENSE"
+to   = "licenses/libpng/upstream/libpng"
