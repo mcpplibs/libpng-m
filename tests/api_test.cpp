@@ -476,7 +476,9 @@ TEST(Library, UserMemoryVersionOptionsIntegers) {
     EXPECT_EQ(png_access_version_number(), static_cast<png_uint_32>(PNG_LIBPNG_VER));
     EXPECT_STREQ(png_get_libpng_ver(nullptr), PNG_LIBPNG_VER_STRING);
     EXPECT_STREQ(png_libpng_ver, PNG_LIBPNG_VER_STRING);
-    EXPECT_EQ(std::string(png_get_header_version(nullptr)), std::string(PNG_HEADER_VERSION_STRING) + "\n");  // png.c adds a newline
+    // png.c appends a newline when the C compiler defines __STDC__ (not MSVC's C mode).
+    const std::string header = png_get_header_version(nullptr);
+    EXPECT_TRUE(header == PNG_HEADER_VERSION_STRING || header == std::string(PNG_HEADER_VERSION_STRING) + "\n") << header;
     png_byte b[4];
     png_save_uint_32(b, 0xdeadbeefU);
     EXPECT_EQ(png_get_uint_32(b), 0xdeadbeefU);
