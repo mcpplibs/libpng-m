@@ -2,7 +2,7 @@
 [package]
 namespace   = "mcpplibs.mwrap"
 name        = "libpng"
-version     = "1.6.43"
+version     = "1.6.43.1"
 description = "libpng 1.6.43 C++ modules for mcpp (import mcpplibs.mwrap.libpng;): the API of png.h over compat.libpng, its macros as constants and constexpr functions, its build options as constexpr bool"
 license     = "Apache-2.0"
 authors     = ["mcpp-community"]
