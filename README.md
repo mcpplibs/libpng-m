@@ -26,7 +26,7 @@ a port written against the module, with every outcome equal to upstream's.
 ## Getting started
 
 ```sh
-mcpp new pictures --template mcpplibs.mwrap.libpng@1.6.43
+mcpp new pictures --template mcpplibs.mwrap.libpng@1.6.43.1
 cd pictures
 mcpp run
 ```
@@ -37,7 +37,7 @@ it back pixel for pixel, and describes it with the low-level reader;
 
 ```toml
 [dependencies]
-"mcpplibs.mwrap.libpng" = "1.6.43"
+mcpplibs.mwrap.libpng = "1.6.43.1"
 ```
 
 ```cpp

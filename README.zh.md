@@ -25,7 +25,7 @@ constexpr 函数，把构建选项映射成 `constexpr bool`。每次 CI 都会�
 ## 快速开始
 
 ```sh
-mcpp new pictures --template mcpplibs.mwrap.libpng@1.6.43
+mcpp new pictures --template mcpplibs.mwrap.libpng@1.6.43.1
 cd pictures
 mcpp run
 ```
@@ -35,7 +35,7 @@ mcpp run
 
 ```toml
 [dependencies]
-"mcpplibs.mwrap.libpng" = "1.6.43"
+mcpplibs.mwrap.libpng = "1.6.43.1"
 ```
 
 ```cpp
