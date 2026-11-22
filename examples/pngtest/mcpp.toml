@@ -9,7 +9,7 @@ kind = "bin"
 main = "src/main.cpp"
 
 [dependencies]
-"mcpplibs.mwrap.libpng" = { path = "../.." }
+mcpplibs.mwrap.libpng = { path = "../.." }
 # zlib.h, for ZLIB_VERSION and Z_FILTERED as pngtest.c uses them: the zlib
 # compat.libpng is built over.
 compat.zlib = "1.3.2"
